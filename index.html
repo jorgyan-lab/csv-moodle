@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Extrator, Gerador e Validador de planilhas CSV para inclusão de usuários no Moodle.">
+    <title>Extrator e Validador Moodle - Painel Unificado</title>
+    <!-- Favicon matching the green logo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Crect width='32' height='32' rx='8' fill='%2310B981'/%3E%3Cg transform='translate(4, 4)' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/g%3E%3C/svg%3E">
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style sheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- SheetJS library -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation (inspired by inspiracao.png) -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <span class="logo-text">Extrator e Validador Moodle</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li>
+                        <button class="nav-menu-item active" data-target="section-inicio" onclick="navigateTo('section-inicio')">
+                            <span class="nav-item-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="9"></rect>
+                                    <rect x="14" y="3" width="7" height="5"></rect>
+                                    <rect x="14" y="12" width="7" height="9"></rect>
+                                    <rect x="3" y="16" width="7" height="5"></rect>
+                                </svg>
+                            </span>
+                            <span>Início / Painel</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-menu-item" data-target="section-gerador" onclick="navigateTo('section-gerador')">
+                            <span class="nav-item-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                            </span>
+                            <span>Extrator / Gerador</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-menu-item" data-target="section-validador" onclick="navigateTo('section-validador')">
+                            <span class="nav-item-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </span>
+                            <span>Validador de CSV</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <!-- User Profile Info -->
+                <div class="user-profile-widget">
+                    <div class="user-avatar-wrapper">
+                        <div class="user-avatar-placeholder">M</div>
+                    </div>
+                    <div class="user-info-text">
+                        <div class="user-name">Usuário Moodle</div>
+                        <div class="user-role">Painel Integrado</div>
+                    </div>
+                </div>
+
+                <!-- Theme switch controller (Light/Dark Toggle Pill) -->
+                <div class="theme-switch-container">
+                    <button class="theme-btn theme-light active" id="theme-btn-light" onclick="setTheme('light')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span>Claro</span>
+                    </button>
+                    <button class="theme-btn theme-dark" id="theme-btn-dark" onclick="setTheme('dark')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span>Escuro</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="app-main-content">
+            <!-- Global header -->
+            <header class="app-header">
+                <div class="header-breadcrumbs">
+                    <span class="breadcrumb-parent">Moodle Tools</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current" id="header-active-tab">Início</span>
+                </div>
+                <div class="header-actions">
+                    <span class="title-bar-badge">v1.1</span>
+                </div>
+            </header>
+
+            <!-- App Sections Containers -->
+            <div class="sections-wrapper">
+
+                <!-- SECTION 1: INÍCIO / DASHBOARD -->
+                <div id="section-inicio" class="app-section active">
+                    <div class="welcome-banner">
+                        <div class="welcome-text-side">
+                            <h1>Bem-vindo ao Extrator e Validador Moodle!</h1>
+                            <p>Simplifique a criação, formatação e validação de inscrições em salas do Moodle em um único lugar.</p>
+                        </div>
+                        <div class="welcome-graphic">
+                            <div class="graphic-element circle-1"></div>
+                            <div class="graphic-element circle-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="modules-grid">
+                        <!-- Module Card 1: Generator -->
+                        <div class="module-card">
+                            <div class="card-image-header generator-gradient">
+                                <div class="card-icon-circle">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                                    </svg>
+                                </div>
+                                <div class="card-badge">Extrator de Dados</div>
+                            </div>
+                            <div class="card-content-body">
+                                <h3>Gerador de CSV Moodle</h3>
+                                <p>Adicione usuários manualmente ou importe planilhas de turmas (Excel/Calc) para formatar e exportar o arquivo CSV perfeito de inclusão com as colunas corretas e codificação ideal.</p>
+                                <button class="btn btn-primary btn-full-width" onclick="navigateTo('section-gerador')">
+                                    <span>Acessar Gerador</span>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Module Card 2: Validator -->
+                        <div class="module-card">
+                            <div class="card-image-header validator-gradient">
+                                <div class="card-icon-circle">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="card-badge">Validador de Dados</div>
+                            </div>
+                            <div class="card-content-body">
+                                <h3>Validador de Planilhas</h3>
+                                <p>Carregue planilhas já prontas para verificar erros comuns de importação como e-mails duplicados, formatos de CPF/SIAPE inválidos, nomes sem sobrenome, ou logins com caracteres especiais.</p>
+                                <button class="btn btn-primary btn-full-width" onclick="navigateTo('section-validador')">
+                                    <span>Acessar Validador</span>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: GERADOR DE CSV -->
+                <div id="section-gerador" class="app-section">
+                    <div class="section-back-bar">
+                        <button class="btn btn-secondary btn-back" onclick="navigateTo('section-inicio')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            <span>Voltar ao Painel</span>
+                        </button>
+                    </div>
+                    <!-- Room Name input section -->
+                    <div class="fluent-card compact-card" style="margin-bottom: 20px;">
+                        <div class="course-layout">
+                            <div class="course-form-side">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="courseName">
+                                        <span>Nome breve da sala</span>
+                                        <span class="guide-link" onclick="openGuideModal()" title="Ver instrução visual de onde encontrar no Moodle">❓ Onde encontrar?</span>
+                                    </label>
+                                    <input type="text" class="form-input" id="courseName" placeholder="metodologia_ensino_2026" autocomplete="off">
+                                    <div class="form-helper-row">
+                                        <span class="form-hint">Acesse a sala → Configurações para encontrar o nome breve (veja o guia ao lado).</span>
+                                        <span class="form-error" id="courseNameError"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-image-side">
+                                <div class="guide-card" onclick="openGuideModal()" title="Clique para abrir e ampliar o guia visual">
+                                    <div class="guide-badge">Ajuda</div>
+                                    <img src="assets/images/moodle_guide.png" alt="Guia visual Moodle" class="guide-img-thumb">
+                                    <div class="guide-overlay">
+                                        <span class="guide-zoom-icon">🔍</span>
+                                        <span class="guide-zoom-text">Ampliar Guia</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spreadsheet sheet editor -->
+                    <div class="fluent-card card-full">
+                        <div class="step-header">
+                            <h2 class="step-title">Cadastro de Usuários</h2>
+                            <p class="step-desc">Insira os usuários da sala Moodle. Você pode preencher manualmente ou importar uma planilha existente.</p>
+                        </div>
+
+                        <!-- Role Bulk Assignment Buttons -->
+                        <div class="role-bulk-bar">
+                            <span class="role-bulk-title">Marque a caixa de seleção à esquerda das linhas desejadas e clique em um papel abaixo para aplicar em lote:</span>
+                            <div class="role-bulk-buttons">
+                                <button type="button" class="btn-role role-aluno" onclick="applyBulkRoleToSelected('Aluno')">Aluno</button>
+                                <button type="button" class="btn-role role-professor" onclick="applyBulkRoleToSelected('Professor Formador')">Prof. Formador</button>
+                                <button type="button" class="btn-role role-tutor-dist" onclick="applyBulkRoleToSelected('Tutor à Distância')">Tutor Distância</button>
+                                <button type="button" class="btn-role role-tutor-pres" onclick="applyBulkRoleToSelected('Tutor Presencial')">Tutor Presencial</button>
+                                <button type="button" class="btn-role role-editor" onclick="applyBulkRoleToSelected('Editor Moodle')">Editor Moodle</button>
+                                <button type="button" class="btn-role role-coord-curso" onclick="applyBulkRoleToSelected('Coordenador de Curso')">Coord. Curso</button>
+                                <button type="button" class="btn-role role-coord-polo" onclick="applyBulkRoleToSelected('Coordenador de Polo')">Coord. Polo</button>
+                                <button type="button" class="btn-role role-monitor" onclick="applyBulkRoleToSelected('Monitor')">Monitor</button>
+                            </div>
+                        </div>
+
+                        <div class="sheet-wrapper">
+                            <table class="sheet" id="sheet">
+                                <thead>
+                                    <tr>
+                                        <th class="col-select"><input type="checkbox" id="selectAllRows" onchange="toggleSelectAll(this)"></th>
+                                        <th class="col-name">Nome</th>
+                                        <th class="col-name">Sobrenome</th>
+                                        <th class="col-email">Email</th>
+                                        <th class="col-id">login (CPF, SIAPE ou Matrícula)</th>
+                                        <th class="col-grupo">Grupo (opcional)</th>
+                                        <th class="col-papel">Papel</th>
+                                        <th class="col-action">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sheetBody"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Actions bar: Add row + Import Spreadsheet -->
+                        <div class="sheet-actions-bar">
+                            <button class="btn-add-row-compact" id="btnAddRow" onclick="addRow()">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 2V14M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Adicionar linha</span>
+                            </button>
+                            <button class="btn btn-secondary-compact" onclick="document.getElementById('importFile').click()">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 14V5M8 5L4.5 8.5M8 5L11.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12.5V13.5C2 14.05 2.45 14.5 3 14.5H13C13.55 14.5 14 14.05 14 13.5V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Importar Planilha (Excel/Calc)</span>
+                            </button>
+                            <input type="file" id="importFile" accept=".xlsx,.xls,.ods" style="display: none;" onchange="handleSpreadsheetImport(this)">
+                            
+                            <div class="drag-hint-text">
+                                <span>💡 <strong>Dica:</strong> você também pode arrastar e soltar a planilha diretamente nesta aba para importar dados.</span>
+                            </div>
+                        </div>
+
+                        <!-- Validation errors list -->
+                        <div class="sheet-errors" id="sheetErrors"></div>
+
+                        <!-- Completion Info -->
+                        <div class="completion-area" id="completionArea">
+                            <div class="info-row">
+                                <div class="info-box">
+                                    <span class="info-icon">📎</span>
+                                    <div>Faça o download do arquivo CSV e <strong>insira-o no chamado</strong> para importação no Moodle.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generator Footer Actions -->
+                        <div class="nav-bar" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                            <button class="btn btn-secondary" onclick="clearGerador()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                                <span>Limpar</span>
+                            </button>
+                            <button class="btn btn-success" onclick="generateCSV()">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12.5V13.5C2 14.05 2.45 14.5 3 14.5H13C13.55 14.5 14 14.05 14 13.5V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Gerar e Baixar CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: VALIDADOR DE PLANILHAS -->
+                <div id="section-validador" class="app-section">
+                    <div class="section-back-bar">
+                        <button class="btn btn-secondary btn-back" onclick="navigateTo('section-inicio')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            <span>Voltar ao Painel</span>
+                        </button>
+                    </div>
+                    <!-- Upload Card -->
+                    <div class="fluent-card" id="uploadCard">
+                        <div class="upload-header">
+                            <h2 class="page-title">Validar Planilha de Usuários</h2>
+                            <p class="page-desc">Faça upload de um arquivo <strong>CSV</strong>, <strong>ODS</strong> ou <strong>XLSX</strong> para validar as regras e dados antes da importação definitiva no Moodle.</p>
+                        </div>
+
+                        <div class="upload-zone" id="uploadZone">
+                            <input type="file" id="fileInput" accept=".csv,.ods,.xlsx,.xls" hidden>
+                            <div class="upload-icon">
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                    <rect x="8" y="6" width="32" height="36" rx="3" stroke="currentColor" stroke-width="2" />
+                                    <path d="M16 18H32M16 24H32M16 30H26" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4" />
+                                    <circle cx="36" cy="36" r="10" fill="var(--accent-primary)" />
+                                    <path d="M36 31V41M31 36H41" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            <p class="upload-text">Arraste a planilha aqui ou <button class="btn-link" onclick="document.getElementById('fileInput').click()">selecione do computador</button></p>
+                            <span class="upload-hint">Formatos aceitos: .csv, .ods, .xlsx</span>
+                        </div>
+
+                        <div class="expected-format">
+                            <h3>Colunas validadas na planilha (ponto e vírgula ou vírgula):</h3>
+                            <div class="columns-list">
+                                <span class="col-tag">firstname</span>
+                                <span class="col-tag">lastname</span>
+                                <span class="col-tag">username</span>
+                                <span class="col-tag">email</span>
+                                <span class="col-tag">course1</span>
+                                <span class="col-tag">group1</span>
+                                <span class="col-tag">role1</span>
+                                <span class="col-tag">idnumber</span>
+                                <span class="col-tag">password</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results section (initially hidden) -->
+                    <div class="fluent-card results-card" id="resultsCard" style="display:none;">
+                        <div class="results-header">
+                            <div>
+                                <h2 class="results-title" id="resultsTitle">Resultado da Validação</h2>
+                                <p class="results-file" id="resultsFile"></p>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-success" id="btnDownloadCsv" onclick="downloadCSV()" style="display:none;">
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                        <path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 12.5V13.5C2 14.05 2.45 14.5 3 14.5H13C13.55 14.5 14 14.05 14 13.5V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <span>Baixar como CSV</span>
+                                </button>
+                                <button class="btn btn-secondary" onclick="resetValidator()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                    <span>Limpar / Novo arquivo</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="summary-row" id="summaryRow"></div>
+
+                        <!-- Errors Section -->
+                        <div id="errorsSection" style="display:none;">
+                            <h3 class="section-title error-title">⚠️ Erros encontrados</h3>
+                            <div class="errors-list" id="errorsList"></div>
+                        </div>
+
+                        <!-- Warnings Section -->
+                        <div id="warningsSection" style="display:none;">
+                            <h3 class="section-title warning-title">💡 Avisos</h3>
+                            <div class="warnings-list" id="warningsList"></div>
+                        </div>
+
+                        <!-- Data Preview -->
+                        <h3 class="section-title">📋 Pré-visualização dos dados</h3>
+                        <div class="legend-bar" id="legendBar" style="display:none;"></div>
+                        <div class="preview-wrapper">
+                            <table class="preview-table" id="previewTable">
+                                <thead id="previewHead"></thead>
+                                <tbody id="previewBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Page Footer (inspired by design) -->
+            <footer class="app-footer">
+                <div class="footer-inner">
+                    <span>Criado com ❤️ para CEFOR/IFES</span>
+                    <span class="footer-separator">•</span>
+                    <span><a href="https://www.linkedin.com/in/jorgyan" target="_blank" rel="noopener noreferrer">@jorgyan</a> — Jorgyan Ribeiro</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Guide Modal (from Generator helper) -->
+    <div class="modal" id="guideModal" onclick="closeGuideModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeGuideModal()">&times;</span>
+            <img src="assets/images/moodle_guide.png" alt="Guia Moodle" class="modal-img">
+            <div class="modal-caption">Configurações do curso no Moodle — Localização do Nome Breve</div>
+        </div>
+    </div>
+
+    <!-- Drag & Drop Overlay (from Generator) -->
+    <div class="drag-overlay" id="dragOverlay">
+        <div class="drag-overlay-content">
+            <svg class="drag-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <h3>Importar Planilha no Gerador</h3>
+            <p>Solte a planilha (.xlsx, .xls ou .ods) aqui para carregar os usuários na tabela do Gerador.</p>
+        </div>
+    </div>
+
+    <!-- Toast container for notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- App Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>
