@@ -1177,6 +1177,10 @@ body.dark-theme .sheet tr[class*="row-role-"] .cell-select:not(:focus) {
     color: var(--text-primary);
 }
 
+.upload-text .highlight-green {
+    color: var(--success);
+}
+
 .upload-hint {
     font-size: 13px;
     color: var(--text-muted);

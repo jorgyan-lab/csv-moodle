@@ -287,7 +287,7 @@
                                 </svg>
                                 <span>Adicionar linha</span>
                             </button>
-                            <button class="btn btn-secondary-compact" onclick="document.getElementById('importFile').click()">
+                            <button class="btn btn-secondary-compact" onclick="const imp = document.getElementById('importFile'); imp.value = ''; imp.click();">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                     <path d="M8 14V5M8 5L4.5 8.5M8 5L11.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M2 12.5V13.5C2 14.05 2.45 14.5 3 14.5H13C13.55 14.5 14 14.05 14 13.5V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -354,8 +354,8 @@
                             <p class="page-desc">Faça upload de um arquivo <strong>CSV</strong>, <strong>ODS</strong> ou <strong>XLSX</strong> para validar as regras e dados antes da importação definitiva no Moodle.</p>
                         </div>
 
+                        <input type="file" id="fileInput" accept=".csv,.ods,.xlsx,.xls" hidden>
                         <div class="upload-zone" id="uploadZone">
-                            <input type="file" id="fileInput" accept=".csv,.ods,.xlsx,.xls" hidden>
                             <div class="upload-icon">
                                 <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
                                     <rect x="8" y="6" width="32" height="36" rx="3" stroke="currentColor" stroke-width="2" />
@@ -364,7 +364,7 @@
                                     <path d="M36 31V41M31 36H41" stroke="#fff" stroke-width="2" stroke-linecap="round" />
                                 </svg>
                             </div>
-                            <p class="upload-text">Arraste a planilha aqui ou <button class="btn-link" onclick="document.getElementById('fileInput').click()">selecione do computador</button></p>
+                            <p class="upload-text">Arraste a planilha aqui ou <span class="highlight-green">selecione o arquivo</span></p>
                             <span class="upload-hint">Formatos aceitos: .csv, .ods, .xlsx</span>
                         </div>
 

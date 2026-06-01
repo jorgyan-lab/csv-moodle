@@ -792,6 +792,7 @@ const DEFAULT_PASSWORD = 'Mud@r123';
 
 let currentExportData = null;
 let currentExportFileName = null;
+let isValidadorFileDialogOpen = false;
 
 function initValidadorListeners() {
     const zone = document.getElementById('uploadZone');
@@ -799,7 +800,22 @@ function initValidadorListeners() {
 
     if (!zone || !valInput) return;
 
-    zone.addEventListener('click', () => valInput.click());
+    zone.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target === valInput) return;
+        if (isValidadorFileDialogOpen) return;
+        isValidadorFileDialogOpen = true;
+        valInput.value = '';
+        valInput.click();
+        window.addEventListener('focus', () => {
+            setTimeout(() => {
+                isValidadorFileDialogOpen = false;
+            }, 0);
+        }, { once: true });
+    });
+
+    valInput.addEventListener('click', e => e.stopPropagation());
     zone.addEventListener('dragover', e => { 
         e.preventDefault(); 
         zone.classList.add('drag-over'); 
@@ -813,6 +829,7 @@ function initValidadorListeners() {
         }
     });
     valInput.addEventListener('change', () => { 
+        isValidadorFileDialogOpen = false;
         if (valInput.files.length) {
             processValidadorFile(valInput.files[0]);
         } 
